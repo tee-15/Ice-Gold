@@ -1,6 +1,7 @@
 import FeaturedCategories from '../components/FeaturedCategories'
 import BestSellers from '../components/BestSellers'
 import HeroCarousel from '../components/HeroCarousel'
+import BrandStory from '../components/BrandStory'
 
 export default function HomePage() {
   return (
@@ -24,6 +25,9 @@ export default function HomePage() {
 
       {/* Best Sellers */}
       <BestSellers />
+
+      {/* Brand Story Split Screen */}
+      <BrandStory />
     </main>
   )
 }

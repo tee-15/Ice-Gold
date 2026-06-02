@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Heart } from 'lucide-react';
+import Link from 'next/link';
 
 const MOCK_PRODUCTS = [
   {
@@ -36,9 +37,9 @@ function ProductCard({ product }) {
   return (
     <article className="product-card">
       <div className="product-image-wrapper">
-        <a href={`/products/${product.id}`} className="product-image-link">
+        <Link href={`/products/${product.id}`} className="product-image-link">
           <img src={product.image} alt={product.title} loading="lazy" />
-        </a>
+        </Link>
         
         <button 
           className="wishlist-btn" 
@@ -59,7 +60,7 @@ function ProductCard({ product }) {
       </div>
 
       <div className="product-info">
-        <h3><a href={`/products/${product.id}`}>{product.title}</a></h3>
+        <h3><Link href={`/products/${product.id}`}>{product.title}</Link></h3>
         <p>{product.price}</p>
       </div>
     </article>
@@ -71,7 +72,7 @@ export default function BestSellers() {
     <section className="best-sellers-section">
       <div className="section-header">
         <h2 className="section-title">Best Sellers</h2>
-        <a href="/collections/best-sellers" className="link-underlined">Shop All Best Sellers</a>
+        <Link href="/collections/best-sellers" className="link-underlined">Shop All Best Sellers</Link>
       </div>
 
       <div className="products-grid">
