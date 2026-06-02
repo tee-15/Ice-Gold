@@ -1,7 +1,7 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Eye, EyeOff, Package, User, MapPin, LogOut } from 'lucide-react'
+import { Eye, EyeOff, Truck, MapPin, Lock, CreditCard, Archive, Heart, MessageCircle, LogOut } from 'lucide-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
 
 export default function AccountPage() {
@@ -18,6 +18,25 @@ export default function AccountPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Orders state
+  const [orders, setOrders] = useState([]);
+  const [isLoadingOrders, setIsLoadingOrders] = useState(true);
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      fetch('/api/orders')
+        .then(res => res.json())
+        .then(data => {
+          if (data.orders) setOrders(data.orders);
+          setIsLoadingOrders(false);
+        })
+        .catch(err => {
+          console.error(err);
+          setIsLoadingOrders(false);
+        });
+    }
+  }, [status]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,90 +82,141 @@ export default function AccountPage() {
 
   if (isAuthenticated) {
     return (
-      <div className="main-layout" style={{ paddingTop: '80px', backgroundColor: '#faf9f6', minHeight: '100vh', color: '#4a4a4a' }}>
-        <section style={{ padding: '4rem 2rem', maxWidth: '1100px', margin: '0 auto' }}>
-          <div style={{ marginBottom: '4rem', textAlign: 'center' }}>
-            <h1 className="soft-serif" style={{ fontSize: '38px', color: '#333', fontWeight: 400, letterSpacing: '0.01em', marginBottom: '0.5rem' }}>My Account</h1>
-            <p style={{ color: '#888', fontSize: '14px', letterSpacing: '0.05em' }}>Welcome back, {session?.user?.name?.split(' ')[0] || 'beautiful'}</p>
+      <>
+        <div className="main-layout" style={{ paddingTop: '80px', backgroundColor: '#fff', minHeight: '100vh', paddingBottom: '4rem', fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '2rem' }} className="account-container">
+          
+          <div style={{ marginBottom: '2.5rem' }}>
+            <h1 style={{ fontSize: '28px', fontWeight: 600, color: '#111', marginBottom: '0.25rem' }}>Your Account</h1>
+            <p style={{ color: '#6b7280', fontSize: '14px' }}>
+              {session?.user?.name || 'User'}, Email: {session?.user?.email}
+            </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: '4rem' }} className="account-grid">
+          <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: '3rem' }} className="account-grid">
             {/* Sidebar Navigation */}
             <aside style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }} className="account-sidebar">
               <button 
                 onClick={() => setActiveTab('orders')}
-                className={`soft-tab ${activeTab === 'orders' ? 'active' : ''}`}
+                className={`sidebar-tab ${activeTab === 'orders' ? 'active' : ''}`}
               >
-                Order History
-              </button>
-              <button 
-                onClick={() => setActiveTab('details')}
-                className={`soft-tab ${activeTab === 'details' ? 'active' : ''}`}
-              >
-                Account Details
+                <Truck size={20} color="#3b82f6" /> <span>My orders</span>
               </button>
               <button 
                 onClick={() => setActiveTab('addresses')}
-                className={`soft-tab ${activeTab === 'addresses' ? 'active' : ''}`}
+                className={`sidebar-tab ${activeTab === 'addresses' ? 'active' : ''}`}
               >
-                Addresses
+                <MapPin size={20} color="#3b82f6" /> <span>Your addresses</span>
               </button>
-              <div style={{ marginTop: '2rem' }}>
-                <button 
-                  onClick={() => signOut()}
-                  className="soft-tab sign-out-tab"
-                >
-                  Sign Out
-                </button>
-              </div>
+              <button 
+                onClick={() => setActiveTab('details')}
+                className={`sidebar-tab ${activeTab === 'details' ? 'active' : ''}`}
+              >
+                <Lock size={20} color="#3b82f6" /> <span>Login & security</span>
+              </button>
+              <button className="sidebar-tab">
+                <CreditCard size={20} color="#3b82f6" /> <span>Payments</span>
+              </button>
+              <button className="sidebar-tab">
+                <Archive size={20} color="#3b82f6" /> <span>Archived orders</span>
+              </button>
+              <button className="sidebar-tab">
+                <Heart size={20} color="#3b82f6" /> <span>Saved items</span>
+              </button>
+              
+              <div style={{ margin: '1rem 0' }}></div>
+              
+              <button className="sidebar-tab">
+                <MessageCircle size={20} color="#3b82f6" /> <span>Customer support</span>
+              </button>
+              <button 
+                onClick={() => signOut()}
+                className="sidebar-tab"
+              >
+                <LogOut size={20} color="#3b82f6" /> <span>Log out</span>
+              </button>
             </aside>
 
             {/* Main Content Area */}
-            <main className="account-main">
+            <main>
               {activeTab === 'orders' && (
                 <div className="fade-in">
-                  <h2 className="soft-serif" style={{ fontSize: '26px', color: '#333', marginBottom: '2rem', fontWeight: 400 }}>Order History</h2>
-                  <div className="soft-card empty-state">
-                    <p>You haven't placed any orders yet.</p>
-                    <Link href="/shop" className="soft-btn" style={{ display: 'inline-block', marginTop: '1.5rem' }}>
-                      Start Shopping
-                    </Link>
+                  <div style={{ display: 'flex', backgroundColor: '#f3f4f6', borderRadius: '8px', padding: '0.25rem', marginBottom: '2rem', width: 'fit-content' }}>
+                    <button style={{ padding: '0.6rem 2.5rem', backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '14px', fontWeight: 500, color: '#111', cursor: 'pointer', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>Current</button>
+                    <button style={{ padding: '0.6rem 2.5rem', backgroundColor: 'transparent', border: 'none', fontSize: '14px', color: '#4b5563', cursor: 'pointer' }}>Unpaid</button>
+                    <button style={{ padding: '0.6rem 2.5rem', backgroundColor: 'transparent', border: 'none', fontSize: '14px', color: '#4b5563', cursor: 'pointer' }}>All orders</button>
                   </div>
+                  
+                  {isLoadingOrders ? (
+                    <div style={{ padding: '4rem 1.5rem', textAlign: 'center', color: '#6b7280' }}>Loading your orders...</div>
+                  ) : orders.length === 0 ? (
+                    <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '4rem 1.5rem', textAlign: 'center' }}>
+                      <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '1.5rem' }}>You haven't placed any orders yet.</p>
+                      <Link href="/shop" style={{ display: 'inline-block', padding: '0.6rem 1.5rem', backgroundColor: '#fff', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', fontWeight: 500, color: '#374151', cursor: 'pointer', textDecoration: 'none' }}>
+                        Start Shopping
+                      </Link>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                      {orders.map(order => (
+                        <div key={order.id} style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '1.5rem' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #e5e7eb', paddingBottom: '1rem', marginBottom: '1rem' }}>
+                            <div>
+                              <p style={{ fontSize: '16px', fontWeight: 600, color: '#111' }}>Order #{order.id.slice(-6).toUpperCase()}</p>
+                              <p style={{ fontSize: '13px', color: '#6b7280', marginTop: '0.25rem' }}>{new Date(order.createdAt).toLocaleDateString()}</p>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              <p style={{ fontSize: '16px', fontWeight: 600, color: '#111' }}>${order.total.toFixed(2)}</p>
+                              <p style={{ fontSize: '13px', color: '#10b981', marginTop: '0.25rem', textTransform: 'capitalize' }}>{order.status}</p>
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto' }}>
+                            {order.items.map(item => (
+                              <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', minWidth: '200px' }}>
+                                <img src={item.product?.image} alt={item.product?.title} style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', backgroundColor: '#f3f4f6' }} />
+                                <div>
+                                  <p style={{ fontSize: '14px', fontWeight: 500, color: '#111' }}>{item.product?.title}</p>
+                                  <p style={{ fontSize: '13px', color: '#6b7280' }}>Qty: {item.quantity}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
               {activeTab === 'details' && (
-                <div className="fade-in">
-                  <h2 className="soft-serif" style={{ fontSize: '26px', color: '#333', marginBottom: '2rem', fontWeight: 400 }}>Account Details</h2>
-                  <div className="soft-card">
-                    <div className="detail-row">
-                      <span className="detail-label">Name</span>
-                      <span className="detail-value">{session?.user?.name || 'Not provided'}</span>
+                <div className="fade-in" style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '1.5rem' }}>
+                  <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#111', marginBottom: '1.5rem' }}>Login & security</h2>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '600px' }}>
+                    <div>
+                      <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '0.25rem' }}>Name</p>
+                      <p style={{ fontSize: '15px', color: '#111', fontWeight: 500 }}>{session?.user?.name || 'Not provided'}</p>
                     </div>
-                    
-                    <div className="detail-row">
-                      <span className="detail-label">Email</span>
-                      <span className="detail-value">{session?.user?.email}</span>
+                    <div>
+                      <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '0.25rem' }}>Email</p>
+                      <p style={{ fontSize: '15px', color: '#111', fontWeight: 500 }}>{session?.user?.email}</p>
                     </div>
-
-                    <div className="detail-row" style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: 0 }}>
-                      <span className="detail-label">Password</span>
-                      <span className="detail-value">••••••••</span>
+                    <div>
+                      <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '0.25rem' }}>Password</p>
+                      <p style={{ fontSize: '15px', color: '#111', fontWeight: 500 }}>••••••••</p>
                     </div>
+                    <button style={{ alignSelf: 'flex-start', padding: '0.6rem 1.5rem', backgroundColor: '#fff', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', fontWeight: 500, color: '#374151', cursor: 'pointer' }}>
+                      Update Password
+                    </button>
                   </div>
-                  
-                  <button className="soft-link" style={{ marginTop: '2rem', marginLeft: '1rem' }}>
-                    Update Password
-                  </button>
                 </div>
               )}
 
               {activeTab === 'addresses' && (
-                <div className="fade-in">
-                  <h2 className="soft-serif" style={{ fontSize: '26px', color: '#333', marginBottom: '2rem', fontWeight: 400 }}>Addresses</h2>
-                  <div className="soft-card empty-state">
-                    <p>No addresses saved yet.</p>
-                    <button className="soft-btn" style={{ marginTop: '1.5rem' }}>
+                <div className="fade-in" style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '1.5rem' }}>
+                  <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#111', marginBottom: '1.5rem' }}>Your addresses</h2>
+                  <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
+                    <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '1.5rem' }}>No addresses saved yet.</p>
+                    <button style={{ padding: '0.6rem 1.5rem', backgroundColor: '#fff', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', fontWeight: 500, color: '#374151', cursor: 'pointer' }}>
                       Add New Address
                     </button>
                   </div>
@@ -154,8 +224,58 @@ export default function AccountPage() {
               )}
             </main>
           </div>
-        </section>
-      </div>
+          </div>
+        </div>
+        <style jsx>{`
+          .sidebar-tab {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            background: transparent;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #4b5563;
+            text-align: left;
+            transition: all 0.2s ease;
+          }
+          .sidebar-tab:hover {
+            background-color: #f3f4f6;
+          }
+          .sidebar-tab.active {
+            background-color: #e0e7ff;
+            color: #2563eb;
+          }
+          .sidebar-tab.active svg {
+            color: #2563eb !important;
+          }
+
+          @media (max-width: 768px) {
+            .account-grid {
+              grid-template-columns: 1fr !important;
+              gap: 2rem !important;
+            }
+            .account-sidebar {
+              flex-direction: row !important;
+              flex-wrap: wrap;
+              margin-bottom: 1rem;
+            }
+          }
+
+          .fade-in {
+            animation: fadeIn 0.3s ease forwards;
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}</style>
+      </>
     );
   }
 
@@ -368,128 +488,40 @@ export default function AccountPage() {
             margin-bottom: 1rem;
           }
         }
-        
-        .soft-serif {
-          font-family: 'Playfair Display', serif;
-        }
 
-        .soft-tab {
-          text-align: left;
+        .sidebar-tab {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          width: 100%;
+          padding: 0.75rem 1rem;
+          border-radius: 0;
           background: transparent;
           border: none;
           cursor: pointer;
           font-size: 15px;
-          color: #888;
-          transition: all 0.4s ease;
-          padding: 1rem 1.5rem;
-          border-radius: 12px;
-          font-family: inherit;
-        }
-        .soft-tab:hover {
-          color: #4a4a4a;
-          background-color: rgba(0,0,0,0.02);
-        }
-        .soft-tab.active {
-          color: #4a4a4a;
-          background-color: #fff;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.03);
           font-weight: 500;
+          color: #111;
+          text-align: left;
+          transition: all 0.2s ease;
         }
-        
-        .sign-out-tab {
-          color: #999;
+        .sidebar-tab:hover {
+          background-color: #f3f4f6;
         }
-        .sign-out-tab:hover {
-          color: #d97777;
-          background-color: #fff5f5;
+        .sidebar-tab.active {
+          background-color: #e0e7ff;
+          color: #2563eb;
         }
-
-        .soft-card {
-          background-color: #fff;
-          border-radius: 16px;
-          padding: 2.5rem;
-          box-shadow: 0 10px 40px rgba(0,0,0,0.03);
-          border: 1px solid rgba(0,0,0,0.02);
+        .sidebar-tab.active svg {
+          color: #2563eb !important;
         }
 
-        .detail-row {
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-          padding-bottom: 1.5rem;
-          margin-bottom: 1.5rem;
-          border-bottom: 1px solid #f0f0f0;
+        .fade-in {
+          animation: fadeIn 0.3s ease forwards;
         }
-        .detail-label {
-          font-size: 12px;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          color: #aaa;
-        }
-        .detail-value {
-          font-size: 16px;
-          color: #333;
-        }
-
-        .empty-state {
-          text-align: center;
-          padding: 4rem 2rem;
-        }
-        .empty-state p {
-          color: #888;
-          font-size: 15px;
-          font-family: 'Playfair Display', serif;
-          font-style: italic;
-        }
-
-        .soft-btn {
-          background-color: #f7f3ed;
-          color: #5a4b41;
-          border: none;
-          border-radius: 30px;
-          padding: 0.8rem 2.5rem;
-          font-size: 13px;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          text-decoration: none;
-        }
-        .soft-btn:hover {
-          background-color: #efeae2;
-          transform: translateY(-2px);
-        }
-
-        .soft-link {
-          background: none;
-          border: none;
-          color: #888;
-          font-size: 12px;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          cursor: pointer;
-          padding: 0;
-          position: relative;
-          transition: color 0.3s ease;
-        }
-        .soft-link:hover {
-          color: #4a4a4a;
-        }
-        .soft-link::after {
-          content: '';
-          position: absolute;
-          bottom: -4px;
-          left: 0;
-          width: 100%;
-          height: 1px;
-          background-color: #ccc;
-          transform: scaleX(0);
-          transform-origin: right;
-          transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .soft-link:hover::after {
-          transform: scaleX(1);
-          transform-origin: left;
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(5px); }
+          to { opacity: 1; transform: translateY(0); }
         }
 
         .fade-in {
