@@ -11,12 +11,17 @@ export default function ShopPage() {
   const { toggleWishlist, isInWishlist } = useWishlistStore();
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedMaterials, setSelectedMaterials] = useState([]);
+  
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const PRODUCTS_PER_PAGE = 24;
 
   // Toggle category
   const handleCategoryToggle = (category) => {
     setSelectedCategories(prev => 
       prev.includes(category) ? prev.filter(c => c !== category) : [...prev, category]
     );
+    setCurrentPage(1); // Reset to first page on filter
   };
 
   // Toggle material
@@ -24,6 +29,7 @@ export default function ShopPage() {
     setSelectedMaterials(prev => 
       prev.includes(material) ? prev.filter(m => m !== material) : [...prev, material]
     );
+    setCurrentPage(1); // Reset to first page on filter
   };
 
   // Filter products
@@ -33,13 +39,36 @@ export default function ShopPage() {
     return categoryMatch && materialMatch;
   });
 
+  // Calculate Pagination
+  const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * PRODUCTS_PER_PAGE,
+    currentPage * PRODUCTS_PER_PAGE
+  );
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="shop-layout">
       {/* Shop Hero */}
-      <section className="shop-hero">
-        <div className="shop-hero-content">
-          <h1>All Jewelry</h1>
-          <p>Discover our complete collection of luxury, water-resistant pieces designed for everyday elegance.</p>
+      <section 
+        className="shop-hero"
+        style={{
+          backgroundImage: 'linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6)), url(https://cdn.shopify.com/s/files/1/0524/9325/4812/files/screw-on-gem-bracelet-3479784.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          color: '#fff',
+          borderBottom: 'none'
+        }}
+      >
+        <div className="shop-hero-content" style={{ zIndex: 2 }}>
+          <h1 style={{ color: '#fff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>All Jewelry</h1>
+          <p style={{ color: '#eaeaea', letterSpacing: '0.02em', fontSize: '18px' }}>
+            Discover our complete collection of luxury, water-resistant pieces designed for everyday elegance.
+          </p>
         </div>
       </section>
 
@@ -103,8 +132,8 @@ export default function ShopPage() {
 
           {/* Grid */}
           <div className="shop-grid">
-            {filteredProducts.length > 0 ? (
-              filteredProducts.map((product) => (
+            {paginatedProducts.length > 0 ? (
+              paginatedProducts.map((product) => (
                 <div key={product.id} className="product-card">
                   <div className="product-image-wrapper">
                     <Link href={`/products/${product.id}`} className="product-image-link">
@@ -142,6 +171,61 @@ export default function ShopPage() {
               </div>
             )}
           </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '4rem' }}>
+              <button 
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                style={{ 
+                  padding: '0.5rem 1rem', 
+                  border: '1px solid #eaeaea', 
+                  backgroundColor: 'transparent', 
+                  cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                  opacity: currentPage === 1 ? 0.5 : 1
+                }}
+              >
+                Previous
+              </button>
+              
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: page === currentPage ? '1px solid var(--color-primary-text)' : '1px solid transparent',
+                      backgroundColor: page === currentPage ? 'var(--color-primary-bg)' : 'transparent',
+                      cursor: 'pointer',
+                      borderRadius: '50%'
+                    }}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+
+              <button 
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                style={{ 
+                  padding: '0.5rem 1rem', 
+                  border: '1px solid #eaeaea', 
+                  backgroundColor: 'transparent', 
+                  cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                  opacity: currentPage === totalPages ? 0.5 : 1
+                }}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </main>
       </div>
     </div>
