@@ -20,7 +20,7 @@ export default function SearchModal({ isOpen, onClose }) {
   }, [isOpen]);
 
   useEffect(() => {
-    if (query.trim().length > 1) {
+    if (query.trim().length > 0) {
       const lowerQuery = query.toLowerCase();
       const filtered = ALL_PRODUCTS.filter(product => 
         product.title.toLowerCase().includes(lowerQuery) || 

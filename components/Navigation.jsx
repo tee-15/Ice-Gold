@@ -52,7 +52,7 @@ export default function Navigation() {
 
         {/* Icons (Right) */}
         <div className="nav-icons">
-          <button onClick={() => setIsSearchOpen(true)} aria-label="Search" className="icon-btn desktop-only">
+          <button onClick={() => setIsSearchOpen(true)} aria-label="Search" className="icon-btn">
             <Search size={22} strokeWidth={1.5} />
           </button>
           <Link href="/account" aria-label="Account" className="icon-btn desktop-only"><User size={22} strokeWidth={1.5} /></Link>
