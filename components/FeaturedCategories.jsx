@@ -1,37 +1,6 @@
 import React from 'react';
-
-const CATEGORIES = [
-  {
-    title: 'Necklaces',
-    image: 'https://cdn.shopify.com/s/files/1/0524/9325/4812/files/screw-on-gem-bracelet-3479784.png',
-    link: '/collections/necklaces'
-  },
-  {
-    title: 'Bracelets',
-    image: 'https://cdn.shopify.com/s/files/1/0524/9325/4812/files/screw-on-gem-bracelet-1240777.png',
-    link: '/collections/bracelets'
-  },
-  {
-    title: 'Rings',
-    image: 'https://cdn.shopify.com/s/files/1/0524/9325/4812/files/gemstone-dome-ring-2002793.jpg',
-    link: '/collections/rings'
-  },
-  {
-    title: 'Earrings',
-    image: 'https://cdn.shopify.com/s/files/1/0524/9325/4812/files/gemstone-dome-ring-9979469.png',
-    link: '/collections/earrings'
-  },
-  {
-    title: 'Chains',
-    image: 'https://cdn.shopify.com/s/files/1/0524/9325/4812/files/screw-on-gem-bracelet-7928243.png',
-    link: '/collections/chains'
-  },
-  {
-    title: 'Sets',
-    image: 'https://cdn.shopify.com/s/files/1/0524/9325/4812/files/gemstone-dome-ring-5431099.jpg',
-    link: '/collections/sets'
-  }
-];
+import { COLLECTIONS } from '../lib/data';
+import Link from 'next/link';
 
 export default function FeaturedCategories() {
   return (
@@ -42,8 +11,8 @@ export default function FeaturedCategories() {
       </div>
 
       <div className="categories-grid">
-        {CATEGORIES.map((category) => (
-          <a key={category.title} href={category.link} className="category-card">
+        {COLLECTIONS.map((category) => (
+          <Link key={category.title} href={category.link} className="category-card">
             <div className="category-image-wrapper">
               <img 
                 src={category.image} 
@@ -55,7 +24,7 @@ export default function FeaturedCategories() {
             <div className="category-content">
               <h3>{category.title}</h3>
             </div>
-          </a>
+          </Link>
         ))}
       </div>
     </section>

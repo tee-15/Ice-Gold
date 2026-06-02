@@ -4,35 +4,17 @@ import React, { useState } from 'react';
 import { Heart } from 'lucide-react';
 import Link from 'next/link';
 
-const MOCK_PRODUCTS = [
-  {
-    id: '1',
-    title: 'Gemstone Dome Ring',
-    price: '$89.00',
-    image: 'https://cdn.shopify.com/s/files/1/0524/9325/4812/files/gemstone-dome-ring-2002793.jpg',
-  },
-  {
-    id: '2',
-    title: 'Screw-On Gem Bracelet (Pink)',
-    price: '$89.00',
-    image: 'https://cdn.shopify.com/s/files/1/0524/9325/4812/files/screw-on-gem-bracelet-3479784.png',
-  },
-  {
-    id: '3',
-    title: 'Screw-On Gem Bracelet (Blue)',
-    price: '$89.00',
-    image: 'https://cdn.shopify.com/s/files/1/0524/9325/4812/files/screw-on-gem-bracelet-1238419.png',
-  },
-  {
-    id: '4',
-    title: 'Screw-On Gem Bracelet (Purple)',
-    price: '$89.00',
-    image: 'https://cdn.shopify.com/s/files/1/0524/9325/4812/files/screw-on-gem-bracelet-6597881.png',
-  }
-];
+import { useCartStore } from '../store/cartStore';
+import { useWishlistStore } from '../store/wishlistStore';
+import { ALL_PRODUCTS } from '../lib/data';
+
+// Get 4 products for best sellers display
+const BEST_SELLERS = ALL_PRODUCTS.slice(0, 4);
 
 function ProductCard({ product }) {
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const { addToCart } = useCartStore();
+  const { toggleWishlist, isInWishlist } = useWishlistStore();
+  const isWishlisted = isInWishlist(product.id);
 
   return (
     <article className="product-card">
@@ -43,7 +25,7 @@ function ProductCard({ product }) {
         
         <button 
           className="wishlist-btn" 
-          onClick={() => setIsWishlisted(!isWishlisted)}
+          onClick={() => toggleWishlist(product)}
           aria-label="Toggle Wishlist"
         >
           <Heart 
@@ -57,7 +39,7 @@ function ProductCard({ product }) {
         <div className="quick-actions">
           <button 
             className="quick-add-btn"
-            onClick={() => window.dispatchEvent(new Event('open-cart'))}
+            onClick={() => addToCart(product)}
           >
             Quick Add +
           </button>
@@ -81,7 +63,7 @@ export default function BestSellers() {
       </div>
 
       <div className="products-grid">
-        {MOCK_PRODUCTS.map(product => (
+        {BEST_SELLERS.map(product => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>

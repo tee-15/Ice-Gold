@@ -1,34 +1,20 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { X, Trash2 } from 'lucide-react';
+import { useCartStore } from '../store/cartStore';
 
 export default function CartDrawer() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [cartItems, setCartItems] = useState([
-    {
-      id: '1',
-      title: 'Gemstone Dome Ring',
-      price: 89.00,
-      quantity: 1,
-      image: 'https://cdn.shopify.com/s/files/1/0524/9325/4812/files/gemstone-dome-ring-2002793.jpg'
-    }
-  ]);
-
-  useEffect(() => {
-    const handleOpen = () => setIsOpen(true);
-    window.addEventListener('open-cart', handleOpen);
-    return () => window.removeEventListener('open-cart', handleOpen);
-  }, []);
+  const { cartItems, isCartOpen, closeCart, updateQuantity, removeFromCart } = useCartStore();
 
   const total = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
   return (
     <>
-      <div className={`cart-overlay ${isOpen ? 'open' : ''}`} onClick={() => setIsOpen(false)}></div>
-      <div className={`cart-drawer ${isOpen ? 'open' : ''}`}>
+      <div className={`cart-overlay ${isCartOpen ? 'open' : ''}`} onClick={closeCart}></div>
+      <div className={`cart-drawer ${isCartOpen ? 'open' : ''}`}>
         <div className="cart-header">
           <h2>Your Cart ({cartItems.length})</h2>
-          <button onClick={() => setIsOpen(false)} className="icon-btn">
+          <button onClick={closeCart} className="icon-btn">
             <X size={24} strokeWidth={1.5} />
           </button>
         </div>
@@ -42,15 +28,23 @@ export default function CartDrawer() {
                 <p>${item.price.toFixed(2)}</p>
                 <div className="cart-item-actions">
                   <div className="qty-selector">
-                    <button>-</button>
+                    <button onClick={() => updateQuantity(item.id, -1)}>-</button>
                     <span>{item.quantity}</span>
-                    <button>+</button>
+                    <button onClick={() => updateQuantity(item.id, 1)}>+</button>
                   </div>
-                  <button className="remove-btn"><Trash2 size={16} strokeWidth={1.5}/></button>
+                  <button className="remove-btn" onClick={() => removeFromCart(item.id)}>
+                    <Trash2 size={16} strokeWidth={1.5}/>
+                  </button>
                 </div>
               </div>
             </div>
           ))}
+          
+          {cartItems.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-secondary-text)' }}>
+              Your cart is empty.
+            </div>
+          )}
         </div>
 
         <div className="cart-footer">
@@ -59,7 +53,7 @@ export default function CartDrawer() {
             <span>${total.toFixed(2)}</span>
           </div>
           <p className="cart-shipping-note">Taxes and shipping calculated at checkout</p>
-          <button className="checkout-btn">Checkout</button>
+          <button className="checkout-btn" disabled={cartItems.length === 0}>Checkout</button>
         </div>
       </div>
     </>

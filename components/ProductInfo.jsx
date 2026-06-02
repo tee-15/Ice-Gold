@@ -1,7 +1,10 @@
 'use client'
 import React, { useState } from 'react'
+import Link from 'next/link'
+import { useCartStore } from '../store/cartStore'
 
 export default function ProductInfo({ product }) {
+  const { addToCart } = useCartStore()
   const [activeAccordion, setActiveAccordion] = useState(0) // First open by default
 
   const toggleAccordion = (idx) => {
@@ -16,6 +19,13 @@ export default function ProductInfo({ product }) {
 
   return (
     <div className="pdp-info-wrapper">
+      <nav className="pdp-breadcrumbs">
+        <Link href="/">Home</Link>
+        <span className="breadcrumb-separator">/</span>
+        <Link href="/collections/best-sellers">Best Sellers</Link>
+        <span className="breadcrumb-separator">/</span>
+        <span className="breadcrumb-current">{product.title}</span>
+      </nav>
       <h1 className="pdp-title">{product.title}</h1>
       <div className="pdp-price">{product.price}</div>
       <p className="pdp-description">{product.description}</p>
@@ -23,7 +33,7 @@ export default function ProductInfo({ product }) {
       <div className="pdp-actions">
         <button 
           className="add-to-cart-btn"
-          onClick={() => window.dispatchEvent(new Event('open-cart'))}
+          onClick={() => addToCart(product)}
         >
           Add to Cart
         </button>
@@ -31,7 +41,7 @@ export default function ProductInfo({ product }) {
 
       <div className="pdp-accordions">
         {accordions.map((acc, idx) => (
-          <div key={idx} className={`accordion-item ${activeAccordion === idx ? 'active' : ''}`}>
+          <div key={idx} className={`accordion-item ${activeAccordion === idx ? 'is-open' : ''}`}>
             <button className="accordion-header" onClick={() => toggleAccordion(idx)}>
               <span>{acc.title}</span>
               <span>{activeAccordion === idx ? '−' : '+'}</span>

@@ -3,10 +3,18 @@
 import React, { useState, useEffect } from 'react';
 import { Search, User, Heart, ShoppingBag, Menu, X } from 'lucide-react';
 import Link from 'next/link';
+import { useCartStore } from '../store/cartStore';
+import { useWishlistStore } from '../store/wishlistStore';
+import SearchModal from './SearchModal';
 
 export default function Navigation() {
+  const { cartItems, openCart } = useCartStore();
+  const { wishlistItems } = useWishlistStore();
+  // Calculate total items (sum of quantities)
+  const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -44,16 +52,21 @@ export default function Navigation() {
 
         {/* Icons (Right) */}
         <div className="nav-icons">
-          <button aria-label="Search" className="icon-btn desktop-only"><Search size={22} strokeWidth={1.5} /></button>
+          <button onClick={() => setIsSearchOpen(true)} aria-label="Search" className="icon-btn desktop-only">
+            <Search size={22} strokeWidth={1.5} />
+          </button>
           <Link href="/account" aria-label="Account" className="icon-btn desktop-only"><User size={22} strokeWidth={1.5} /></Link>
-          <Link href="/wishlist" aria-label="Wishlist" className="icon-btn"><Heart size={22} strokeWidth={1.5} /></Link>
+          <Link href="/wishlist" aria-label="Wishlist" className="icon-btn relative">
+            <Heart size={22} strokeWidth={1.5} />
+            {wishlistItems.length > 0 && <span className="cart-badge">{wishlistItems.length}</span>}
+          </Link>
           <button 
             aria-label="Cart" 
             className="icon-btn relative"
-            onClick={() => window.dispatchEvent(new Event('open-cart'))}
+            onClick={openCart}
           >
             <ShoppingBag size={22} strokeWidth={1.5} />
-            <span className="cart-badge">1</span>
+            {totalItems > 0 && <span className="cart-badge">{totalItems}</span>}
           </button>
         </div>
 
@@ -78,6 +91,7 @@ export default function Navigation() {
           </nav>
         </div>
       )}
+      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </header>
   );
 }
