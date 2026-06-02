@@ -55,7 +55,12 @@ function ProductCard({ product }) {
         </button>
 
         <div className="quick-actions">
-          <button className="quick-add-btn">Quick Add +</button>
+          <button 
+            className="quick-add-btn"
+            onClick={() => window.dispatchEvent(new Event('open-cart'))}
+          >
+            Quick Add +
+          </button>
         </div>
       </div>
 

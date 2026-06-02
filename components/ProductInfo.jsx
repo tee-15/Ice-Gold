@@ -21,7 +21,12 @@ export default function ProductInfo({ product }) {
       <p className="pdp-description">{product.description}</p>
       
       <div className="pdp-actions">
-        <button className="add-to-cart-btn">Add to Cart</button>
+        <button 
+          className="add-to-cart-btn"
+          onClick={() => window.dispatchEvent(new Event('open-cart'))}
+        >
+          Add to Cart
+        </button>
       </div>
 
       <div className="pdp-accordions">

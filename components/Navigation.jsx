@@ -47,9 +47,13 @@ export default function Navigation() {
           <button aria-label="Search" className="icon-btn desktop-only"><Search size={22} strokeWidth={1.5} /></button>
           <Link href="/account" aria-label="Account" className="icon-btn desktop-only"><User size={22} strokeWidth={1.5} /></Link>
           <Link href="/wishlist" aria-label="Wishlist" className="icon-btn"><Heart size={22} strokeWidth={1.5} /></Link>
-          <button aria-label="Cart" className="icon-btn relative">
+          <button 
+            aria-label="Cart" 
+            className="icon-btn relative"
+            onClick={() => window.dispatchEvent(new Event('open-cart'))}
+          >
             <ShoppingBag size={22} strokeWidth={1.5} />
-            <span className="cart-badge">0</span>
+            <span className="cart-badge">1</span>
           </button>
         </div>
 

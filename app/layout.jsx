@@ -1,6 +1,8 @@
 import './globals.css'
 import { Outfit } from 'next/font/google'
 import Navigation from '../components/Navigation'
+import CartDrawer from '../components/CartDrawer'
+import Footer from '../components/Footer'
 
 const outfit = Outfit({ 
   subsets: ['latin'],
@@ -18,7 +20,9 @@ export default function RootLayout({ children }) {
     <html lang="en" className={outfit.variable}>
       <body>
         <Navigation />
+        <CartDrawer />
         {children}
+        <Footer />
       </body>
     </html>
   )
