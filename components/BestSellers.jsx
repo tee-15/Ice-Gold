@@ -1,14 +1,10 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
 import Link from 'next/link';
 
 import { useCartStore } from '../store/cartStore';
 import { useWishlistStore } from '../store/wishlistStore';
-import { ALL_PRODUCTS } from '../lib/data';
-
-// Get 4 products for best sellers display
-const BEST_SELLERS = ALL_PRODUCTS.slice(0, 4);
 
 function ProductCard({ product }) {
   const { addToCart } = useCartStore();
@@ -18,7 +14,7 @@ function ProductCard({ product }) {
   return (
     <article className="product-card">
       <div className="product-image-wrapper">
-        <Link href={`/products/${product.id}`} className="product-image-link">
+        <Link href={`/products/${product.handle}`} className="product-image-link">
           <img src={product.image} alt={product.title} loading="lazy" />
         </Link>
         
@@ -46,7 +42,7 @@ function ProductCard({ product }) {
       </div>
 
       <div className="product-info">
-        <h3><Link href={`/products/${product.id}`}>{product.title}</Link></h3>
+        <h3><Link href={`/products/${product.handle}`}>{product.title}</Link></h3>
         <p>{product.price}</p>
       </div>
     </article>
@@ -54,6 +50,27 @@ function ProductCard({ product }) {
 }
 
 export default function BestSellers() {
+  const [bestSellers, setBestSellers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBestSellers = async () => {
+      try {
+        const res = await fetch('/api/products');
+        const data = await res.json();
+        if (data.products) {
+          // Sort or slice differently to differentiate from New Arrivals
+          setBestSellers(data.products.slice(4, 8));
+        }
+      } catch (err) {
+        console.error('Failed to fetch best sellers', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchBestSellers();
+  }, []);
+
   return (
     <section className="best-sellers-section" style={{ padding: '8rem 2rem', backgroundColor: 'var(--color-primary-bg)' }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
@@ -70,9 +87,13 @@ export default function BestSellers() {
         </div>
 
         <div className="products-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
-          {BEST_SELLERS.map(product => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          {isLoading ? (
+            <div style={{ color: 'var(--color-secondary-text)' }}>Loading best sellers...</div>
+          ) : (
+            bestSellers.map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))
+          )}
         </div>
       </div>
     </section>

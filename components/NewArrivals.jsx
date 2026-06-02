@@ -1,14 +1,10 @@
 'use client'
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Heart } from 'lucide-react';
 
 import { useCartStore } from '../store/cartStore';
 import { useWishlistStore } from '../store/wishlistStore';
-import { ALL_PRODUCTS } from '../lib/data';
-
-// Get the last 4 products to simulate "New Arrivals"
-const newArrivals = ALL_PRODUCTS.slice(-4).reverse();
 
 function ProductCard({ product }) {
   const { addToCart } = useCartStore();
@@ -18,7 +14,7 @@ function ProductCard({ product }) {
   return (
     <article className="product-card">
       <div className="product-image-wrapper">
-        <Link href={`/products/${product.id}`} className="product-image-link">
+        <Link href={`/products/${product.handle}`} className="product-image-link">
           <img src={product.image} alt={product.title} loading="lazy" decoding="async" className="primary-image" />
         </Link>
         
@@ -43,7 +39,7 @@ function ProductCard({ product }) {
       </div>
       
       <div className="product-info">
-        <Link href={`/products/${product.id}`} className="product-title-link">
+        <Link href={`/products/${product.handle}`} className="product-title-link">
           <h3>{product.title}</h3>
         </Link>
         <p className="product-price">{product.price}</p>
@@ -53,6 +49,26 @@ function ProductCard({ product }) {
 }
 
 export default function NewArrivals() {
+  const [newArrivals, setNewArrivals] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNewArrivals = async () => {
+      try {
+        const res = await fetch('/api/products');
+        const data = await res.json();
+        if (data.products) {
+          setNewArrivals(data.products.slice(0, 4));
+        }
+      } catch (err) {
+        console.error('Failed to fetch new arrivals', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchNewArrivals();
+  }, []);
+
   return (
     <section className="best-sellers-section" style={{ padding: '8rem 2rem', backgroundColor: 'var(--color-primary-bg)' }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
@@ -69,9 +85,13 @@ export default function NewArrivals() {
         </div>
 
         <div className="product-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
-          {newArrivals.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          {isLoading ? (
+            <div style={{ color: 'var(--color-secondary-text)' }}>Loading new arrivals...</div>
+          ) : (
+            newArrivals.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))
+          )}
         </div>
       </div>
     </section>

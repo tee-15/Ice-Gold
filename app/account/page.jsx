@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, Package, User, MapPin, LogOut } from 'lucide-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
 
 export default function AccountPage() {
@@ -63,50 +63,52 @@ export default function AccountPage() {
 
   if (isAuthenticated) {
     return (
-      <div className="main-layout" style={{ paddingTop: '80px', backgroundColor: 'var(--color-primary-bg)', minHeight: '100vh' }}>
-        <section style={{ padding: '4rem 2rem', maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem', borderBottom: '1px solid #eee', paddingBottom: '2rem' }}>
-            <h1 className="section-title" style={{ fontSize: '32px' }}>My Account</h1>
-            <button 
-              onClick={() => signOut()} 
-              className="link-underlined"
-              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-            >
-              Sign Out
-            </button>
+      <div className="main-layout" style={{ paddingTop: '80px', backgroundColor: '#faf9f6', minHeight: '100vh', color: '#4a4a4a' }}>
+        <section style={{ padding: '4rem 2rem', maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{ marginBottom: '4rem', textAlign: 'center' }}>
+            <h1 className="soft-serif" style={{ fontSize: '38px', color: '#333', fontWeight: 400, letterSpacing: '0.01em', marginBottom: '0.5rem' }}>My Account</h1>
+            <p style={{ color: '#888', fontSize: '14px', letterSpacing: '0.05em' }}>Welcome back, {session?.user?.name?.split(' ')[0] || 'beautiful'}</p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '4rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: '4rem' }} className="account-grid">
             {/* Sidebar Navigation */}
-            <aside style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <aside style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }} className="account-sidebar">
               <button 
                 onClick={() => setActiveTab('orders')}
-                style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem 0', fontSize: '16px', color: activeTab === 'orders' ? 'var(--color-primary-text)' : 'var(--color-secondary-text)', fontWeight: activeTab === 'orders' ? 500 : 400, borderBottom: activeTab === 'orders' ? '1px solid var(--color-primary-text)' : '1px solid transparent' }}
+                className={`soft-tab ${activeTab === 'orders' ? 'active' : ''}`}
               >
                 Order History
               </button>
               <button 
                 onClick={() => setActiveTab('details')}
-                style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem 0', fontSize: '16px', color: activeTab === 'details' ? 'var(--color-primary-text)' : 'var(--color-secondary-text)', fontWeight: activeTab === 'details' ? 500 : 400, borderBottom: activeTab === 'details' ? '1px solid var(--color-primary-text)' : '1px solid transparent' }}
+                className={`soft-tab ${activeTab === 'details' ? 'active' : ''}`}
               >
                 Account Details
               </button>
               <button 
                 onClick={() => setActiveTab('addresses')}
-                style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem 0', fontSize: '16px', color: activeTab === 'addresses' ? 'var(--color-primary-text)' : 'var(--color-secondary-text)', fontWeight: activeTab === 'addresses' ? 500 : 400, borderBottom: activeTab === 'addresses' ? '1px solid var(--color-primary-text)' : '1px solid transparent' }}
+                className={`soft-tab ${activeTab === 'addresses' ? 'active' : ''}`}
               >
                 Addresses
               </button>
+              <div style={{ marginTop: '2rem' }}>
+                <button 
+                  onClick={() => signOut()}
+                  className="soft-tab sign-out-tab"
+                >
+                  Sign Out
+                </button>
+              </div>
             </aside>
 
             {/* Main Content Area */}
-            <main>
+            <main className="account-main">
               {activeTab === 'orders' && (
-                <div>
-                  <h2 style={{ fontSize: '24px', marginBottom: '2rem', fontWeight: 400 }}>Order History</h2>
-                  <div style={{ padding: '3rem', border: '1px dashed #ccc', textAlign: 'center' }}>
-                    <p style={{ color: 'var(--color-secondary-text)' }}>You haven't placed any orders yet.</p>
-                    <Link href="/shop" className="btn-primary" style={{ display: 'inline-block', marginTop: '1.5rem', padding: '0.8rem 2rem' }}>
+                <div className="fade-in">
+                  <h2 className="soft-serif" style={{ fontSize: '26px', color: '#333', marginBottom: '2rem', fontWeight: 400 }}>Order History</h2>
+                  <div className="soft-card empty-state">
+                    <p>You haven't placed any orders yet.</p>
+                    <Link href="/shop" className="soft-btn" style={{ display: 'inline-block', marginTop: '1.5rem' }}>
                       Start Shopping
                     </Link>
                   </div>
@@ -114,30 +116,40 @@ export default function AccountPage() {
               )}
 
               {activeTab === 'details' && (
-                <div>
-                  <h2 style={{ fontSize: '24px', marginBottom: '2rem', fontWeight: 400 }}>Account Details</h2>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '500px' }}>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-secondary-text)', marginBottom: '0.5rem' }}>Name</label>
-                      <p style={{ fontSize: '16px' }}>{session?.user?.name || 'Not provided'}</p>
+                <div className="fade-in">
+                  <h2 className="soft-serif" style={{ fontSize: '26px', color: '#333', marginBottom: '2rem', fontWeight: 400 }}>Account Details</h2>
+                  <div className="soft-card">
+                    <div className="detail-row">
+                      <span className="detail-label">Name</span>
+                      <span className="detail-value">{session?.user?.name || 'Not provided'}</span>
                     </div>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-secondary-text)', marginBottom: '0.5rem' }}>Email</label>
-                      <p style={{ fontSize: '16px' }}>{session?.user?.email}</p>
+                    
+                    <div className="detail-row">
+                      <span className="detail-label">Email</span>
+                      <span className="detail-value">{session?.user?.email}</span>
                     </div>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-secondary-text)', marginBottom: '0.5rem' }}>Password</label>
-                      <p style={{ fontSize: '16px' }}>••••••••</p>
+
+                    <div className="detail-row" style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: 0 }}>
+                      <span className="detail-label">Password</span>
+                      <span className="detail-value">••••••••</span>
                     </div>
                   </div>
+                  
+                  <button className="soft-link" style={{ marginTop: '2rem', marginLeft: '1rem' }}>
+                    Update Password
+                  </button>
                 </div>
               )}
 
               {activeTab === 'addresses' && (
-                <div>
-                  <h2 style={{ fontSize: '24px', marginBottom: '2rem', fontWeight: 400 }}>Addresses</h2>
-                  <p style={{ color: 'var(--color-secondary-text)' }}>No addresses saved yet.</p>
-                  <button className="btn-secondary" style={{ marginTop: '2rem' }}>Add New Address</button>
+                <div className="fade-in">
+                  <h2 className="soft-serif" style={{ fontSize: '26px', color: '#333', marginBottom: '2rem', fontWeight: 400 }}>Addresses</h2>
+                  <div className="soft-card empty-state">
+                    <p>No addresses saved yet.</p>
+                    <button className="soft-btn" style={{ marginTop: '1.5rem' }}>
+                      Add New Address
+                    </button>
+                  </div>
                 </div>
               )}
             </main>
@@ -342,6 +354,150 @@ export default function AccountPage() {
         .form-input::placeholder {
           color: #999;
           letter-spacing: 0.05em;
+        }
+
+        /* Dashboard Styles */
+        @media (max-width: 768px) {
+          .account-grid {
+            grid-template-columns: 1fr !important;
+            gap: 2rem !important;
+          }
+          .account-sidebar {
+            flex-direction: row !important;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+          }
+        }
+        
+        .soft-serif {
+          font-family: 'Playfair Display', serif;
+        }
+
+        .soft-tab {
+          text-align: left;
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          font-size: 15px;
+          color: #888;
+          transition: all 0.4s ease;
+          padding: 1rem 1.5rem;
+          border-radius: 12px;
+          font-family: inherit;
+        }
+        .soft-tab:hover {
+          color: #4a4a4a;
+          background-color: rgba(0,0,0,0.02);
+        }
+        .soft-tab.active {
+          color: #4a4a4a;
+          background-color: #fff;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+          font-weight: 500;
+        }
+        
+        .sign-out-tab {
+          color: #999;
+        }
+        .sign-out-tab:hover {
+          color: #d97777;
+          background-color: #fff5f5;
+        }
+
+        .soft-card {
+          background-color: #fff;
+          border-radius: 16px;
+          padding: 2.5rem;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+          border: 1px solid rgba(0,0,0,0.02);
+        }
+
+        .detail-row {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          padding-bottom: 1.5rem;
+          margin-bottom: 1.5rem;
+          border-bottom: 1px solid #f0f0f0;
+        }
+        .detail-label {
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          color: #aaa;
+        }
+        .detail-value {
+          font-size: 16px;
+          color: #333;
+        }
+
+        .empty-state {
+          text-align: center;
+          padding: 4rem 2rem;
+        }
+        .empty-state p {
+          color: #888;
+          font-size: 15px;
+          font-family: 'Playfair Display', serif;
+          font-style: italic;
+        }
+
+        .soft-btn {
+          background-color: #f7f3ed;
+          color: #5a4b41;
+          border: none;
+          border-radius: 30px;
+          padding: 0.8rem 2.5rem;
+          font-size: 13px;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          text-decoration: none;
+        }
+        .soft-btn:hover {
+          background-color: #efeae2;
+          transform: translateY(-2px);
+        }
+
+        .soft-link {
+          background: none;
+          border: none;
+          color: #888;
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          cursor: pointer;
+          padding: 0;
+          position: relative;
+          transition: color 0.3s ease;
+        }
+        .soft-link:hover {
+          color: #4a4a4a;
+        }
+        .soft-link::after {
+          content: '';
+          position: absolute;
+          bottom: -4px;
+          left: 0;
+          width: 100%;
+          height: 1px;
+          background-color: #ccc;
+          transform: scaleX(0);
+          transform-origin: right;
+          transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .soft-link:hover::after {
+          transform: scaleX(1);
+          transform-origin: left;
+        }
+
+        .fade-in {
+          animation: fadeIn 0.4s ease forwards;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(5px); }
+          to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
     </div>
