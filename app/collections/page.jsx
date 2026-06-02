@@ -15,7 +15,7 @@ export default function CollectionsPage() {
 
         <div className="categories-grid">
           {COLLECTIONS.map((category) => (
-            <Link key={category.slug} href={category.link} className="category-card">
+            <Link key={category.id} href={`/shop`} className="category-card">
               <div className="category-image-wrapper">
                 <img 
                   src={category.image} 

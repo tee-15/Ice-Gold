@@ -1,8 +1,7 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Heart } from 'lucide-react'
-import { ALL_PRODUCTS, CATEGORIES, MATERIALS } from '../../lib/data'
 import { useCartStore } from '../../store/cartStore'
 import { useWishlistStore } from '../../store/wishlistStore'
 
@@ -12,9 +11,33 @@ export default function ShopPage() {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedMaterials, setSelectedMaterials] = useState([]);
   
+  const [dbProducts, setDbProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const PRODUCTS_PER_PAGE = 24;
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch('/api/products');
+        const data = await res.json();
+        if (data.products) {
+          setDbProducts(data.products);
+        }
+      } catch (err) {
+        console.error('Failed to fetch products', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  // Extract dynamic categories and materials from db
+  const dynamicCategories = [...new Set(dbProducts.map(p => p.category).filter(Boolean))];
+  const dynamicMaterials = [...new Set(dbProducts.map(p => p.material).filter(Boolean))];
 
   // Toggle category
   const handleCategoryToggle = (category) => {
@@ -33,7 +56,7 @@ export default function ShopPage() {
   };
 
   // Filter products
-  const filteredProducts = ALL_PRODUCTS.filter(product => {
+  const filteredProducts = dbProducts.filter(product => {
     const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(product.category);
     const materialMatch = selectedMaterials.length === 0 || selectedMaterials.includes(product.material);
     return categoryMatch && materialMatch;
@@ -80,7 +103,7 @@ export default function ShopPage() {
           <div className="filter-group">
             <h3>Category</h3>
             <ul>
-              {CATEGORIES.map(category => (
+              {dynamicCategories.map(category => (
                 <li key={category}>
                   <label>
                     <input 
@@ -98,7 +121,7 @@ export default function ShopPage() {
           <div className="filter-group">
             <h3>Material</h3>
             <ul>
-              {MATERIALS.map(material => (
+              {dynamicMaterials.map(material => (
                 <li key={material}>
                   <label>
                     <input 
@@ -132,11 +155,15 @@ export default function ShopPage() {
 
           {/* Grid */}
           <div className="shop-grid">
-            {paginatedProducts.length > 0 ? (
+            {isLoading ? (
+              <div style={{ padding: '4rem 0', gridColumn: '1 / -1', textAlign: 'center', color: 'var(--color-secondary-text)' }}>
+                Loading our exquisite collection...
+              </div>
+            ) : paginatedProducts.length > 0 ? (
               paginatedProducts.map((product) => (
                 <div key={product.id} className="product-card">
                   <div className="product-image-wrapper">
-                    <Link href={`/products/${product.id}`} className="product-image-link">
+                    <Link href={`/products/${product.handle}`} className="product-image-link">
                       <img src={product.image} alt={product.title} loading="lazy" className="primary-image" />
                     </Link>
                     <button 
@@ -158,7 +185,7 @@ export default function ShopPage() {
                     </div>
                   </div>
                   <div className="product-info">
-                    <Link href={`/products/${product.id}`} className="product-title-link">
+                    <Link href={`/products/${product.handle}`} className="product-title-link">
                       <h3>{product.title}</h3>
                     </Link>
                     <p className="product-price">{product.price}</p>
@@ -166,7 +193,7 @@ export default function ShopPage() {
                 </div>
               ))
             ) : (
-              <div style={{ padding: '2rem 0', color: 'var(--color-secondary-text)' }}>
+              <div style={{ padding: '2rem 0', gridColumn: '1 / -1', textAlign: 'center', color: 'var(--color-secondary-text)' }}>
                 No products match the selected filters.
               </div>
             )}

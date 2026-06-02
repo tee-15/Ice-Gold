@@ -2,20 +2,64 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { Eye, EyeOff } from 'lucide-react'
+import { signIn, signOut, useSession } from 'next-auth/react'
 
 export default function AccountPage() {
+  const { data: session, status } = useSession();
+  
   // 'login', 'register', or 'forgot'
   const [view, setView] = useState('login');
   const [showPassword, setShowPassword] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState('orders');
 
-  const handleSubmit = (e) => {
+  // Form states
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (view === 'login' || view === 'register') {
-      setIsAuthenticated(true);
+    setError('');
+    setIsLoading(true);
+
+    if (view === 'login') {
+      const res = await signIn('credentials', {
+        redirect: false,
+        email,
+        password
+      });
+      if (res?.error) {
+        setError(res.error);
+      }
+    } else if (view === 'register') {
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+        const data = await res.json();
+        
+        if (!res.ok) {
+          setError(data.error || 'Failed to register');
+        } else {
+          // Auto sign in after registration
+          await signIn('credentials', { redirect: false, email, password });
+        }
+      } catch (err) {
+        setError('Something went wrong. Please try again.');
+      }
     }
+    setIsLoading(false);
   };
+
+  if (status === 'loading') {
+    return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</div>;
+  }
+
+  const isAuthenticated = status === 'authenticated';
 
   if (isAuthenticated) {
     return (
@@ -24,7 +68,7 @@ export default function AccountPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem', borderBottom: '1px solid #eee', paddingBottom: '2rem' }}>
             <h1 className="section-title" style={{ fontSize: '32px' }}>My Account</h1>
             <button 
-              onClick={() => setIsAuthenticated(false)} 
+              onClick={() => signOut()} 
               className="link-underlined"
               style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
             >
@@ -75,11 +119,11 @@ export default function AccountPage() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '500px' }}>
                     <div>
                       <label style={{ display: 'block', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-secondary-text)', marginBottom: '0.5rem' }}>Name</label>
-                      <p style={{ fontSize: '16px' }}>Sarah Doe</p>
+                      <p style={{ fontSize: '16px' }}>{session?.user?.name || 'Not provided'}</p>
                     </div>
                     <div>
                       <label style={{ display: 'block', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-secondary-text)', marginBottom: '0.5rem' }}>Email</label>
-                      <p style={{ fontSize: '16px' }}>sarah@example.com</p>
+                      <p style={{ fontSize: '16px' }}>{session?.user?.email}</p>
                     </div>
                     <div>
                       <label style={{ display: 'block', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-secondary-text)', marginBottom: '0.5rem' }}>Password</label>
@@ -152,21 +196,21 @@ export default function AccountPage() {
           </div>
           
           <form style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }} onSubmit={handleSubmit}>
+            {error && (
+              <div style={{ padding: '1rem', backgroundColor: '#fee2e2', color: '#991b1b', fontSize: '14px', borderRadius: '4px' }}>
+                {error}
+              </div>
+            )}
+            
             {view === 'register' && (
               <div style={{ display: 'flex', gap: '1rem' }}>
                 <div className="input-group" style={{ flex: 1 }}>
                   <input 
                     type="text" 
-                    placeholder="First Name" 
+                    placeholder="Full Name" 
                     className="form-input"
-                    required
-                  />
-                </div>
-                <div className="input-group" style={{ flex: 1 }}>
-                  <input 
-                    type="text" 
-                    placeholder="Last Name" 
-                    className="form-input"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     required
                   />
                 </div>
@@ -178,6 +222,8 @@ export default function AccountPage() {
                 type="email" 
                 placeholder="Email Address" 
                 className="form-input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
@@ -188,6 +234,8 @@ export default function AccountPage() {
                   type={showPassword ? "text" : "password"} 
                   placeholder="Password" 
                   className="form-input"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                 />
                 <button 
@@ -224,8 +272,8 @@ export default function AccountPage() {
               </div>
             )}
             
-            <button type="submit" className="btn-primary" style={{ marginTop: '1rem', width: '100%' }}>
-              {view === 'login' ? 'Sign In' : view === 'register' ? 'Create Account' : 'Send Reset Link'}
+            <button type="submit" className="btn-primary" disabled={isLoading} style={{ marginTop: '1rem', width: '100%', opacity: isLoading ? 0.7 : 1 }}>
+              {isLoading ? 'Processing...' : view === 'login' ? 'Sign In' : view === 'register' ? 'Create Account' : 'Send Reset Link'}
             </button>
           </form>
           

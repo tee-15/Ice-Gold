@@ -28,7 +28,7 @@ export default function ProductInfo({ product }) {
       </nav>
       <h1 className="pdp-title">{product.title}</h1>
       <div className="pdp-price">{product.price}</div>
-      <p className="pdp-description">{product.description}</p>
+      <div className="pdp-description" dangerouslySetInnerHTML={{ __html: product.description }} />
       
       <div className="pdp-actions">
         <button 

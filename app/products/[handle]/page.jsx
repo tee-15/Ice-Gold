@@ -1,24 +1,34 @@
 import React from 'react'
 import ProductGallery from '../../../components/ProductGallery'
 import ProductInfo from '../../../components/ProductInfo'
-import { ALL_PRODUCTS } from '../../../lib/data'
 import { notFound } from 'next/navigation'
+import { PrismaClient } from '@prisma/client'
 
-export default function ProductPage({ params }) {
-  const productId = parseInt(params.handle, 10)
-  const product = ALL_PRODUCTS.find(p => p.id === productId)
+const prisma = new PrismaClient()
+
+export default async function ProductPage({ params }) {
+  const handle = params.handle;
+  const product = await prisma.product.findUnique({
+    where: { handle }
+  });
 
   if (!product) {
     notFound()
   }
 
+  // Formatting for the existing gallery component since db only stores one main image right now
+  const productWithImages = {
+    ...product,
+    images: [product.image]
+  };
+
   return (
     <div className="pdp-container">
       <div className="pdp-gallery-column">
-        <ProductGallery images={product.images} />
+        <ProductGallery images={productWithImages.images} />
       </div>
       <div className="pdp-info-column">
-        <ProductInfo product={product} />
+        <ProductInfo product={productWithImages} />
       </div>
     </div>
   )
