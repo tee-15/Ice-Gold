@@ -2,15 +2,12 @@ import React from 'react'
 import ProductGallery from '../../../components/ProductGallery'
 import ProductInfo from '../../../components/ProductInfo'
 import { notFound } from 'next/navigation'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { ALL_PRODUCTS } from '../../../lib/data'
 
 export default async function ProductPage({ params }) {
   const handle = params.handle;
-  const product = await prisma.product.findUnique({
-    where: { handle }
-  });
+  // Fallback to checking id if handle is numeric
+  const product = ALL_PRODUCTS.find(p => p.handle === handle || p.id.toString() === handle);
 
   if (!product) {
     notFound()
