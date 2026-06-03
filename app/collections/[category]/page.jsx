@@ -10,20 +10,21 @@ import { useWishlistStore } from '../../../store/wishlistStore'
 export default function CategoryPage({ params }) {
   const { addToCart } = useCartStore()
   const { toggleWishlist, isInWishlist } = useWishlistStore()
-  const categorySlug = params.category
-
-  const collection = COLLECTIONS.find(c => c.handle === categorySlug)
   
-  if (!collection) {
-    notFound()
-  }
+  try {
+    const categorySlug = params.category
+    const collection = COLLECTIONS.find(c => c.handle === categorySlug)
+    
+    if (!collection) {
+      notFound()
+    }
 
-  // Filter products by category title (case insensitive)
-  const categoryProducts = ALL_PRODUCTS.filter(
-    p => p.category.toLowerCase() === collection.title.toLowerCase()
-  )
+    // Filter products by category title (case insensitive)
+    const categoryProducts = ALL_PRODUCTS.filter(
+      p => p.category && p.category.toLowerCase() === collection.title.toLowerCase()
+    )
 
-  return (
+    return (
     <div className="shop-layout">
       {/* Category Hero */}
       <section className="shop-hero" style={{ 
@@ -91,5 +92,9 @@ export default function CategoryPage({ params }) {
         </main>
       </div>
     </div>
-  )
+    )
+  } catch (error) {
+    console.error(error)
+    return <div>Error loading category: {error.message}</div>
+  }
 }
