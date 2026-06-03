@@ -10,6 +10,7 @@ export default function CheckoutSuccessPage() {
   const searchParams = useSearchParams();
   const session_id = searchParams.get('session_id');
   const [verifying, setVerifying] = useState(true);
+  const [verifyError, setVerifyError] = useState(null);
 
   useEffect(() => {
     // Clear the cart on successful checkout
@@ -21,7 +22,15 @@ export default function CheckoutSuccessPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_id }),
-      }).finally(() => setVerifying(false));
+      })
+      .then(res => res.json().then(data => ({ status: res.status, data })))
+      .then(({ status, data }) => {
+        if (status !== 200) {
+          setVerifyError(data.error || 'Verification failed');
+        }
+      })
+      .catch(err => setVerifyError(err.message))
+      .finally(() => setVerifying(false));
     } else {
       setVerifying(false);
     }
@@ -58,6 +67,13 @@ export default function CheckoutSuccessPage() {
         <p style={{ color: '#6b7280', fontSize: '15px', marginBottom: '2rem', lineHeight: '1.5' }}>
           Thank you for your order. Your transaction has been completed and a receipt has been emailed to you.
         </p>
+        
+        {verifyError && (
+          <div style={{ padding: '1rem', backgroundColor: '#fee2e2', color: '#991b1b', fontSize: '14px', borderRadius: '4px', marginBottom: '2rem' }}>
+            Debug: Order capture failed: {verifyError}
+          </div>
+        )}
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <Link 
             href="/account"

@@ -12,7 +12,7 @@ export default function CategoryPage({ params }) {
   const { toggleWishlist, isInWishlist } = useWishlistStore()
   const categorySlug = params.category
 
-  const collection = COLLECTIONS.find(c => c.slug === categorySlug)
+  const collection = COLLECTIONS.find(c => c.handle === categorySlug)
   
   if (!collection) {
     notFound()

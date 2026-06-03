@@ -22,6 +22,7 @@ export default function AccountPage() {
   // Orders state
   const [orders, setOrders] = useState([]);
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
+  const [orderFilter, setOrderFilter] = useState('current');
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -83,7 +84,7 @@ export default function AccountPage() {
   if (isAuthenticated) {
     return (
       <>
-        <div className="main-layout" style={{ paddingTop: '80px', backgroundColor: '#fff', minHeight: '100vh', paddingBottom: '4rem', fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+        <div className="main-layout" style={{ paddingTop: '80px', backgroundColor: '#fff', minHeight: '100vh', paddingBottom: '4rem', fontFamily: 'var(--font-outfit), sans-serif' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '2rem' }} className="account-container">
           
           <div style={{ marginBottom: '2.5rem' }}>
@@ -142,9 +143,24 @@ export default function AccountPage() {
               {activeTab === 'orders' && (
                 <div className="fade-in">
                   <div style={{ display: 'flex', backgroundColor: '#f3f4f6', borderRadius: '8px', padding: '0.25rem', marginBottom: '2rem', width: 'fit-content' }}>
-                    <button style={{ padding: '0.6rem 2.5rem', backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '14px', fontWeight: 500, color: '#111', cursor: 'pointer', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>Current</button>
-                    <button style={{ padding: '0.6rem 2.5rem', backgroundColor: 'transparent', border: 'none', fontSize: '14px', color: '#4b5563', cursor: 'pointer' }}>Unpaid</button>
-                    <button style={{ padding: '0.6rem 2.5rem', backgroundColor: 'transparent', border: 'none', fontSize: '14px', color: '#4b5563', cursor: 'pointer' }}>All orders</button>
+                    <button 
+                      onClick={() => setOrderFilter('current')}
+                      style={{ padding: '0.6rem 2.5rem', backgroundColor: orderFilter === 'current' ? '#fff' : 'transparent', border: orderFilter === 'current' ? '1px solid #e5e7eb' : 'none', borderRadius: '6px', fontSize: '14px', fontWeight: orderFilter === 'current' ? 500 : 400, color: orderFilter === 'current' ? '#111' : '#4b5563', cursor: 'pointer', boxShadow: orderFilter === 'current' ? '0 1px 2px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.2s' }}
+                    >
+                      Current
+                    </button>
+                    <button 
+                      onClick={() => setOrderFilter('unpaid')}
+                      style={{ padding: '0.6rem 2.5rem', backgroundColor: orderFilter === 'unpaid' ? '#fff' : 'transparent', border: orderFilter === 'unpaid' ? '1px solid #e5e7eb' : 'none', borderRadius: '6px', fontSize: '14px', fontWeight: orderFilter === 'unpaid' ? 500 : 400, color: orderFilter === 'unpaid' ? '#111' : '#4b5563', cursor: 'pointer', boxShadow: orderFilter === 'unpaid' ? '0 1px 2px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.2s' }}
+                    >
+                      Unpaid
+                    </button>
+                    <button 
+                      onClick={() => setOrderFilter('all')}
+                      style={{ padding: '0.6rem 2.5rem', backgroundColor: orderFilter === 'all' ? '#fff' : 'transparent', border: orderFilter === 'all' ? '1px solid #e5e7eb' : 'none', borderRadius: '6px', fontSize: '14px', fontWeight: orderFilter === 'all' ? 500 : 400, color: orderFilter === 'all' ? '#111' : '#4b5563', cursor: 'pointer', boxShadow: orderFilter === 'all' ? '0 1px 2px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.2s' }}
+                    >
+                      All orders
+                    </button>
                   </div>
                   
                   {isLoadingOrders ? (
