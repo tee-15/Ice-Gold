@@ -1,12 +1,12 @@
+'use client'
 import React from 'react'
 import ProductGallery from '../../../components/ProductGallery'
 import ProductInfo from '../../../components/ProductInfo'
-import { notFound } from 'next/navigation'
+import { useParams, notFound } from 'next/navigation'
 import { ALL_PRODUCTS } from '../../../lib/data'
 
-export const dynamic = 'force-dynamic';
-
-export default async function ProductPage({ params }) {
+export default function ProductPage() {
+  const params = useParams();
   const rawHandle = params?.handle || '';
   const handle = decodeURIComponent(rawHandle);
   
