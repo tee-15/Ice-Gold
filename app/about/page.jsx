@@ -63,7 +63,7 @@ export default function AboutPage() {
           </div>
           <div style={{ position: 'relative', paddingBottom: '130%', overflow: 'hidden' }}>
             <img 
-              src="/Founder.webp" 
+              src="/founder.webp" 
               alt="Ice & Gold Founder"
               style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center' }}
             />
